@@ -1,0 +1,7 @@
+images/lembar valid1.jpg
+images/lembar valid2.jpg
+__pycache__/
+images/ljk/*.jpg
+images/ljk/*.jpeg
+images/ljk/*.png
+model/fine-tuning-small-handwriting
