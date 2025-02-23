@@ -10,20 +10,22 @@
 6. sentecepiece
 7. matplotlib
 8. imutils
-9. python3.11.7 or newer
+9. protobuf
+10. python3.11.7 or newer
 
 ##### Instalasi package dan menjalankan program
 
-1. Instal requirenment.txt dengan perintah `conda create --name answer-detection --file requirements.txt`
-2. Unduh model ocr ``https://drive.google.com/file/d/1VCwunVXgQlzAoEhfJtVPJZ_zm-CfjDB6/view?usp=sharing`
-3. Ekstrak dan taruh folder model ocr ke dalam folder model. Adapun struktur folder model seharusnya seperti dibawah ini:
+1. Buat Environment baru dengan command `conda create --name answer-detection python=3.11.7` lalu aktivasi Environment dengan perintah `conda activate nama-env`
+2. Install packages dengan perintah `pip install -r requirements.txt`
+3. Unduh model ocr ``https://drive.google.com/file/d/1VCwunVXgQlzAoEhfJtVPJZ_zm-CfjDB6/view?usp=sharing`
+4. Ekstrak dan taruh folder model ocr ke dalam folder model. Adapun struktur folder model seharusnya seperti dibawah ini:
 
    - model
      -- fine-tuning-small-handwriting
      -- best.pt
 
-4. jalankan web server flask dengan menjalankan perintah `python app.py`
-5. adapaun project ini terbagi menjadi 2 endpoint
+5. jalankan web server flask dengan menjalankan perintah `python app.py`
+6. adapaun project ini terbagi menjadi 2 endpoint
    1. `/api/upload/omr` untuk omr
    2. `/api/upload/ocr` untuk ocr
 
