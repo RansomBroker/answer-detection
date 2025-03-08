@@ -17,8 +17,8 @@
 
 1. Buat Environment baru dengan command `conda create --name answer-detection python=3.11.7` lalu aktivasi Environment dengan perintah `conda activate nama-env`
 2. Install packages dengan perintah `pip install -r requirements.txt`
-3. Unduh model ocr ``https://drive.google.com/file/d/1VCwunVXgQlzAoEhfJtVPJZ_zm-CfjDB6/view?usp=sharing`
-4. Ekstrak dan taruh folder model ocr ke dalam folder model. Adapun struktur folder model seharusnya seperti dibawah ini:
+3. Unduh model ocr `https://drive.google.com/file/d/1VCwunVXgQlzAoEhfJtVPJZ_zm-CfjDB6/view?usp=sharing`
+4. Ekstrak dan taruh folder model ocr ke dalam folder model. Adapun struktur folder model seharusnya seperti dibawah ini:z
 
    - model
      -- fine-tuning-small-handwriting
