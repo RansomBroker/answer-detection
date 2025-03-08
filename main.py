@@ -4,7 +4,20 @@ from ultralytics import YOLO
 from transformers import TrOCRProcessor
 from transformers import VisionEncoderDecoderModel
 import time
+import re
 
+def format_generated_text(generated_text):
+    """
+    Fungsi ini mencari pasangan digit dan huruf (misalnya "1A") menggunakan regex,
+    mengurutkannya berdasarkan nomor, dan mengembalikannya sebagai list array.
+    """
+    # Cari semua pasangan yang sesuai dengan pola: satu atau lebih digit diikuti huruf kapital
+    pairs = re.findall(r'(\d+)([A-Z])', generated_text)
+    # Urutkan pasangan berdasarkan angka (dikonversi ke integer)
+    pairs = sorted(pairs, key=lambda pair: int(pair[0]))
+    # Format setiap pasangan menjadi "nomor huruf" dan masukkan ke list
+    formatted_list = [f"{num} {letter}" for num, letter in pairs]
+    return formatted_list   
 
 # OMR
 def scan_answer(template_image, image_path, answer_json):
@@ -76,9 +89,6 @@ def scan_answer(template_image, image_path, answer_json):
 # OCR
 def detect_and_ocr(image_path):
     try:
-        # Load YOLO
-        model = YOLO("model/best.pt")
-
         # Load TrOCR
         processor_path = "microsoft/trocr-small-handwritten"
         model_trocr_path = "model/fine-tuning-small-handwriting"
@@ -88,42 +98,23 @@ def detect_and_ocr(image_path):
 
         # Load image 
         image = cv2.imread(image_path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        # Detect objects
-        results = model([image])
+        # Lakukan inferensi OCR pada gambar tunggal
+        pixel_values = processor(image, return_tensors="pt").pixel_values
 
-        # Cropped image
-        cropped_images = []
+        start_time = time.time()
+        generated_ids = model_trocr.generate(pixel_values)
+        end_time = time.time()
 
-        for result in results:
-            for box in result.boxes:
-                # Crop image
-                cropped_images.append(image[int(box.xyxy[0][1]):int(box.xyxy[0][3]), int(box.xyxy[0][0]):int(box.xyxy[0][2])])
+        inference_time = end_time - start_time
+        generated_text = processor.decode(generated_ids[0], skip_special_tokens=True)
 
-        # Do OCR
-        batch_size = 6  # Adjust the batch size according to your GPU memory
-        all_texts = []
-        inference_times = []
+        formatted_text = format_generated_text(generated_text)
 
-        for i in range(0, len(cropped_images), batch_size):
-            batch_images = cropped_images[i:i + batch_size]
-            pixel_values = processor(batch_images, return_tensors="pt").pixel_values
+        print(inference_time)
 
-            start_time = time.time()
-            generated_ids = model_trocr.generate(pixel_values)
-            end_time = time.time()
-
-            inference_time = end_time - start_time
-            inference_times.append(inference_time)
-
-            generated_texts = processor.batch_decode(generated_ids, skip_special_tokens=True)
-            all_texts.extend(generated_texts)
-            print(inference_time)
-
-        # Sort the texts from small to large
-        all_texts.sort(key=len)
-
-        return {"answers": all_texts, "error": None}
+        return {"answers": formatted_text, "error": None}
 
     except Exception as e:
         return {"answers": [], "error": str(e)}
